@@ -101,13 +101,13 @@ button,select{font:inherit}button{cursor:pointer}
 .modal-close{border:0;border-radius:50%;width:34px;height:34px;background:#2a354a;color:white;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}
 .modal-close:hover{background:var(--red)}
 
-/* CineHD Style Server Grid Overlay (20+ Servers) */
+/* CineHD Style Server Grid Overlay (Backend Driven) */
 #serverGridModal{display:block;background:#0b0f19;border-bottom:1px solid rgba(255,255,255,.12);padding:16px 20px;}
 .alert-banner{background:#e50914;color:#fff;padding:8px 14px;border-radius:6px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.server-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;max-height:220px;overflow-y:auto;padding-right:4px;}
+.server-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;max-height:220px;overflow-y:auto;padding-right:4px;}
 .server-grid::-webkit-scrollbar{width:4px;}
 .server-grid::-webkit-scrollbar-thumb{background:#303d58;border-radius:4px;}
-.server-btn{background:#1a2233;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:10px 8px;color:#fff;font-weight:700;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:.2s;}
+.server-btn{background:#1a2233;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:10px 8px;color:#fff;font-weight:700;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:.2s;text-align:center;}
 .server-btn:hover{background:#28344d;border-color:var(--green);}
 .server-btn.active{background:#3b82f6;border-color:#60a5fa;box-shadow:0 0 15px rgba(59,130,246,.5);}
 
@@ -200,7 +200,7 @@ button,select{font:inherit}button{cursor:pointer}
       </div>
     </div>
     
-    <!-- CineHD Style Server Grid Overlay (20+ Servers from Render Backend) -->
+    <!-- CineHD Style Server Grid Overlay (Driven 100% by Render Backend) -->
     <div id="serverGridModal">
       <div class="alert-banner">
         <span><i class="fa-solid fa-triangle-exclamation"></i> Select 4K, Hindi, Tamil, or Telugu servers below.</span>
