@@ -90,7 +90,7 @@ button,select{font:inherit}button{cursor:pointer}
 .search-grid .poster-card{width:100%;flex:auto}
 .footer{border-top:1px solid var(--line);padding:30px 4%;display:flex;justify-content:space-between;gap:20px;align-items:center;color:#9aa3b2;font-size:12.5px}.footer strong{color:#fff}
 
-/* Elite CineHD Streaming Modal & Server Grid */
+/* Elite Streaming Modal & Server Grid */
 .modal{position:fixed;inset:0;z-index:100;background:rgba(0,0,0,.93);display:none;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(10px)}
 .modal.open{display:flex}
 .modal-box{width:min(980px,100%);max-height:94vh;overflow:auto;border:1px solid rgba(255,255,255,.2);border-radius:16px;background:#131824;box-shadow:0 30px 100px rgba(0,0,0,.95)}
@@ -101,7 +101,7 @@ button,select{font:inherit}button{cursor:pointer}
 .modal-close{border:0;border-radius:50%;width:34px;height:34px;background:#2a354a;color:white;font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s}
 .modal-close:hover{background:var(--red)}
 
-/* CineHD Direct Server Grid */
+/* HDStream4U & Direct Server Grid */
 #serverGridModal{display:block;background:#0b0f19;border-bottom:1px solid rgba(255,255,255,.12);padding:16px 20px;}
 .alert-banner{background:#e50914;color:#fff;padding:8px 14px;border-radius:6px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .server-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;max-height:220px;overflow-y:auto;padding-right:4px;}
@@ -185,7 +185,7 @@ button,select{font:inherit}button{cursor:pointer}
 </main>
 <footer class="footer"><div>© <span id="yearNow"></span> <strong>ZeeHD</strong>. All rights reserved.</div><div>Discover movies and series · Your entertainment guide</div></footer>
 
-<!-- Elite CineHD Streaming Modal -->
+<!-- Streaming Modal with HDStream4U & Multi-Servers -->
 <div class="modal" id="detailModal" onclick="if(event.target===this)closeModal()">
   <div class="modal-box">
     <div class="modal-header">
@@ -200,19 +200,19 @@ button,select{font:inherit}button{cursor:pointer}
       </div>
     </div>
     
-    <!-- CineHD Style Direct Server Grid -->
+    <!-- Server Grid with HDStream4U -->
     <div id="serverGridModal">
       <div class="alert-banner">
-        <span><i class="fa-solid fa-triangle-exclamation"></i> Click any server below to switch stream instantly.</span>
+        <span><i class="fa-solid fa-triangle-exclamation"></i> Select HDStream4U or Backup Servers below.</span>
         <button class="btn btn-secondary" style="padding:3px 8px; font-size:11px;" onclick="toggleServersModal()">✕ Close</button>
       </div>
       <div class="server-grid">
-        <button class="server-btn active" onclick="switchServer('vidsrc-vip', this)"><span>VidSrc VIP</span></button>
+        <button class="server-btn active" onclick="switchServer('hdstream', this)"><span>🔥 HDStream4U</span></button>
+        <button class="server-btn" onclick="switchServer('vidsrc-vip', this)"><span>VidSrc VIP</span></button>
         <button class="server-btn" onclick="switchServer('vidsrc-pro', this)"><span>VidSrc PRO</span></button>
         <button class="server-btn" onclick="switchServer('multiembed', this)"><span>MultiEmbed</span></button>
         <button class="server-btn" onclick="switchServer('twembed', this)"><span>2Embed</span></button>
         <button class="server-btn" onclick="switchServer('moviesapi', this)"><span>MoviesAPI 4K</span></button>
-        <button class="server-btn" onclick="switchServer('vidsrc-cc', this)"><span>VidSrc CC</span></button>
         <button class="server-btn" onclick="switchServer('hindi', this)"><span>🇮🇳 Hindi Dub</span></button>
         <button class="server-btn" onclick="switchServer('tamil', this)"><span>🇮🇳 Tamil Dub</span></button>
         <button class="server-btn" onclick="switchServer('telugu', this)"><span>🇮🇳 Telugu Dub</span></button>
@@ -236,7 +236,7 @@ button,select{font:inherit}button{cursor:pointer}
 <script>
 const API_KEY='fdfd2c30d57b21a4208d9a13c3e62dfb', API='https://api.themoviedb.org/3', IMG='https://image.tmdb.org/t/p/w500', ORIGINAL='https://image.tmdb.org/t/p/original', FALLBACK='https://placehold.co/500x750/121824/ffffff?text=ZeeHD';
 let heroItems=[],heroIndex=0,heroTimer=null,searchTimer=null,currentItem=null;
-let currentId=null, currentType='movie', currentSeason=1, currentEpisode=1, activeServerKey='vidsrc-vip';
+let currentId=null, currentType='movie', currentSeason=1, currentEpisode=1, activeServerKey='hdstream';
 const cache={};
 const $=id=>document.getElementById(id);
 $('yearNow').textContent=new Date().getFullYear();
@@ -376,23 +376,23 @@ function updatePlayerURL(){
   let imdbId = (currentItem && currentItem.imdb_id) ? currentItem.imdb_id : currentId;
 
   if(currentType === 'movie'){
-    if(activeServerKey === 'vidsrc-vip') url = `https://vidsrc.me/embed/movie?tmdb=${currentId}`;
+    if(activeServerKey === 'hdstream') url = `https://hdstream4u.com/embed/${currentId}`;
+    else if(activeServerKey === 'vidsrc-vip') url = `https://vidsrc.me/embed/movie?tmdb=${currentId}`;
     else if(activeServerKey === 'vidsrc-pro') url = `https://vidsrc.xyz/embed/movie?tmdb=${currentId}`;
     else if(activeServerKey === 'multiembed') url = `https://multiembed.mov/?video_id=${currentId}&tmdb=1`;
     else if(activeServerKey === 'twembed') url = `https://www.2embed.cc/embed/${currentId}`;
     else if(activeServerKey === 'moviesapi') url = `https://moviesapi.club/movie/${currentId}`;
-    else if(activeServerKey === 'vidsrc-cc') url = `https://vidsrc.cc/v2/embed/movie/${imdbId}`;
     else if(activeServerKey === 'hindi') url = `https://vidsrc.xyz/embed/movie?tmdb=${currentId}&ds_lang=hi`;
     else if(activeServerKey === 'tamil') url = `https://vidsrc.xyz/embed/movie?tmdb=${currentId}&ds_lang=ta`;
     else if(activeServerKey === 'telugu') url = `https://vidsrc.xyz/embed/movie?tmdb=${currentId}&ds_lang=te`;
     else if(activeServerKey === '4k') url = `https://vidsrc.xyz/embed/movie?tmdb=${currentId}&quality=4k`;
   } else {
-    if(activeServerKey === 'vidsrc-vip') url = `https://vidsrc.me/embed/tv?tmdb=${currentId}&season=${currentSeason}&episode=${currentEpisode}`;
+    if(activeServerKey === 'hdstream') url = `https://hdstream4u.com/embed/tv/${currentId}/${currentSeason}/${currentEpisode}`;
+    else if(activeServerKey === 'vidsrc-vip') url = `https://vidsrc.me/embed/tv?tmdb=${currentId}&season=${currentSeason}&episode=${currentEpisode}`;
     else if(activeServerKey === 'vidsrc-pro') url = `https://vidsrc.xyz/embed/tv?tmdb=${currentId}&season=${currentSeason}&episode=${currentEpisode}`;
     else if(activeServerKey === 'multiembed') url = `https://multiembed.mov/?video_id=${currentId}&tmdb=1&s=${currentSeason}&e=${currentEpisode}`;
     else if(activeServerKey === 'twembed') url = `https://www.2embed.cc/embedtv/${currentId}&s=${currentSeason}&e=${currentEpisode}`;
     else if(activeServerKey === 'moviesapi') url = `https://moviesapi.club/tv/${currentId}-${currentSeason}-${currentEpisode}`;
-    else if(activeServerKey === 'vidsrc-cc') url = `https://vidsrc.cc/v2/embed/tv/${imdbId}/${currentSeason}/${currentEpisode}`;
     else if(activeServerKey === 'hindi') url = `https://vidsrc.xyz/embed/tv?tmdb=${currentId}&season=${currentSeason}&episode=${currentEpisode}&ds_lang=hi`;
     else if(activeServerKey === 'tamil') url = `https://vidsrc.xyz/embed/tv?tmdb=${currentId}&season=${currentSeason}&episode=${currentEpisode}&ds_lang=ta`;
     else if(activeServerKey === 'telugu') url = `https://vidsrc.xyz/embed/tv?tmdb=${currentId}&season=${currentSeason}&episode=${currentEpisode}&ds_lang=te`;
