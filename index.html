@@ -104,7 +104,7 @@ button,select{font:inherit}button{cursor:pointer}
 /* CineHD Style Server Grid Overlay (20+ Servers) */
 #serverGridModal{display:block;background:#0b0f19;border-bottom:1px solid rgba(255,255,255,.12);padding:16px 20px;}
 .alert-banner{background:#e50914;color:#fff;padding:8px 14px;border-radius:6px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
-.server-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;max-height:220px;overflow-y:auto;padding-right:4px;}
+.server-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px;max-height:220px;overflow-y:auto;padding-right:4px;}
 .server-grid::-webkit-scrollbar{width:4px;}
 .server-grid::-webkit-scrollbar-thumb{background:#303d58;border-radius:4px;}
 .server-btn{background:#1a2233;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:10px 8px;color:#fff;font-weight:700;font-size:12px;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:.2s;}
@@ -200,33 +200,14 @@ button,select{font:inherit}button{cursor:pointer}
       </div>
     </div>
     
-    <!-- CineHD Style Server Grid Overlay (20+ Servers) -->
+    <!-- CineHD Style Server Grid Overlay (20+ Servers from Render Backend) -->
     <div id="serverGridModal">
       <div class="alert-banner">
-        <span><i class="fa-solid fa-triangle-exclamation"></i> Select 4K or Dubbed Audio servers below.</span>
+        <span><i class="fa-solid fa-triangle-exclamation"></i> Select 4K, Hindi, Tamil, or Telugu servers below.</span>
         <button class="btn btn-secondary" style="padding:3px 8px; font-size:11px;" onclick="toggleServersModal()">✕ Close</button>
       </div>
-      <div class="server-grid">
-        <button class="server-btn active" id="srv-2embed" onclick="setServer('2embed')"><span>2Embed</span> 🇺🇸</button>
-        <button class="server-btn" id="srv-max" onclick="setServer('max')"><span>Max</span> 🇺🇸</button>
-        <button class="server-btn" id="srv-vidpro" onclick="setServer('vidpro')"><span>Vidpro</span> 🇬🇧</button>
-        <button class="server-btn" id="srv-v2" onclick="setServer('v2')"><span>V2</span> 🇬🇧</button>
-        <button class="server-btn" id="srv-premium" onclick="setServer('premium')"><span>Premium</span> 🇺🇸</button>
-        <button class="server-btn" id="srv-4k" onclick="setServer('4k')"><span>✨ 4K Stream</span> 🇺🇸</button>
-        <button class="server-btn" id="srv-vidfast" onclick="setServer('vidfast')"><span>Vidfast</span> 🇺🇸</button>
-        <button class="server-btn" id="srv-nxsha" onclick="setServer('nxsha')"><span>Nxsha</span> 🇺🇸</button>
-        <button class="server-btn" id="srv-super" onclick="setServer('super')"><span>Super</span> 🇬🇧</button>
-        <button class="server-btn" id="srv-vidcore" onclick="setServer('vidcore')"><span>Vidcore</span> 🇺🇸</button>
-        <button class="server-btn" id="srv-rock" onclick="setServer('rock')"><span>Rock</span> 🇬🇧</button>
-        <button class="server-btn" id="srv-primesrc" onclick="setServer('primesrc')"><span>Primesrc</span> 🇺🇸</button>
-        <button class="server-btn" id="srv-cinemaos" onclick="setServer('cinemaos')"><span>Cinemaos</span> 🇺🇸</button>
-        <button class="server-btn" id="srv-prime" onclick="setServer('prime')"><span>Prime</span> 🇺🇸</button>
-        <button class="server-btn" id="srv-netflix" onclick="setServer('netflix')"><span>Netflix</span> 🇺🇸</button>
-        <button class="server-btn" id="srv-hotstar" onclick="setServer('hotstar')"><span>Hotstar</span> 🇮🇳</button>
-        <button class="server-btn" id="srv-hindi" onclick="setServer('hindi')"><span>🇮🇳 Hindi Dub</span></button>
-        <button class="server-btn" id="srv-tamil" onclick="setServer('tamil')"><span>🇮🇳 Tamil Dub</span></button>
-        <button class="server-btn" id="srv-telugu" onclick="setServer('telugu')"><span>🇮🇳 Telugu Dub</span></button>
-        <button class="server-btn" id="srv-french" onclick="setServer('french')"><span>🇫🇷 French</span></button>
+      <div class="server-grid" id="backendServerGrid">
+        <p class="empty" style="color:#fff;">Loading servers from backend...</p>
       </div>
     </div>
 
@@ -245,8 +226,10 @@ button,select{font:inherit}button{cursor:pointer}
 <div class="toast" id="toast"></div>
 <script>
 const API_KEY='fdfd2c30d57b21a4208d9a13c3e62dfb', API='https://api.themoviedb.org/3', IMG='https://image.tmdb.org/t/p/w500', ORIGINAL='https://image.tmdb.org/t/p/original', FALLBACK='https://placehold.co/500x750/121824/ffffff?text=ZeeHD';
+const BACKEND_URL = 'https://zeehd-backend.onrender.com';
+
 let heroItems=[],heroIndex=0,heroTimer=null,searchTimer=null,currentItem=null;
-let currentId=null, currentType='movie', currentSeason=1, currentEpisode=1, currentServer='2embed';
+let currentId=null, currentType='movie', currentSeason=1, currentEpisode=1;
 const cache={};
 const $=id=>document.getElementById(id);
 $('yearNow').textContent=new Date().getFullYear();
@@ -342,7 +325,7 @@ async function openPlayer(type,id,title){
     console.error(e);
   }
   
-  updatePlayerURL();
+  fetchBackendServers();
   $('detailModal').classList.add('open');
 }
 
@@ -361,12 +344,12 @@ async function changeSeason(){
     let sData=await tmdb(`/tv/${currentId}/season/${currentSeason}`);
     updateEpisodeDropdown(sData.episodes?.length||20);
   }catch(e){updateEpisodeDropdown(20);}
-  updatePlayerURL();
+  fetchBackendServers();
 }
 
 function changeEpisode(){
   currentEpisode=parseInt($('episodeSelect').value);
-  updatePlayerURL();
+  fetchBackendServers();
 }
 
 function toggleServersModal(){
@@ -374,38 +357,36 @@ function toggleServersModal(){
   grid.style.display=grid.style.display==='block'?'none':'block';
 }
 
-function setServer(srv){
-  currentServer=srv;
-  document.querySelectorAll('.server-btn').forEach(b=>b.classList.remove('active'));
-  $(`srv-${srv}`).classList.add('active');
-  updatePlayerURL();
-  notify(`Switched server to ${srv}`);
+async function fetchBackendServers(){
+  let imdbId = (currentItem && currentItem.imdb_id) ? currentItem.imdb_id : currentId;
+  let url = `${BACKEND_URL}/api/servers/${currentType}/${currentId}?imdb=${imdbId}&s=${currentSeason}&e=${currentEpisode}`;
+  
+  $('backendServerGrid').innerHTML='<p class="empty" style="color:#fff;">Loading 20+ servers from backend...</p>';
+  
+  try{
+    let res = await fetch(url);
+    let data = await res.json();
+    if(data.success && data.servers && data.servers.length > 0){
+      let html = '';
+      data.servers.forEach((srv, idx)=>{
+        let active = idx === 0 ? 'active' : '';
+        html += `<button class="server-btn ${active}" onclick="loadServerUrl('${esc(srv.url)}', this)"><span>${esc(srv.name)}</span></button>`;
+      });
+      $('backendServerGrid').innerHTML = html;
+      $('videoFrame').src = data.servers[0].url;
+    }else{
+      $('backendServerGrid').innerHTML='<p class="empty" style="color:#ff5b57;">No servers found.</p>';
+    }
+  }catch(err){
+    console.error("Backend fetch error:", err);
+    $('backendServerGrid').innerHTML='<p class="empty" style="color:#ff5b57;">Failed to connect to Render backend.</p>';
+  }
 }
 
-function updatePlayerURL(){
-  let url='';
-  let imdbId = (currentItem && currentItem.imdb_id) ? currentItem.imdb_id : currentId;
-
-  if(currentType==='movie'){
-    if(currentServer==='hindi') url=`https://vidsrc.me/embed/movie?tmdb=${currentId}&ds_lang=hi`;
-    else if(currentServer==='tamil') url=`https://vidsrc.me/embed/movie?tmdb=${currentId}&ds_lang=ta`;
-    else if(currentServer==='telugu') url=`https://vidsrc.me/embed/movie?tmdb=${currentId}&ds_lang=te`;
-    else if(currentServer==='french') url=`https://vidsrc.me/embed/movie?tmdb=${currentId}&ds_lang=fr`;
-    else if(currentServer==='4k') url=`https://vidsrc.xyz/embed/movie?tmdb=${currentId}&quality=4k`;
-    else if(currentServer==='vidsrc') url=`https://vidsrc.xyz/embed/movie?tmdb=${currentId}`;
-    else if(currentServer==='vidsrc2') url=`https://vidsrc.cc/v2/embed/movie/${imdbId}`;
-    else url=`https://www.2embed.cc/embed/${currentId}`;
-  }else{
-    if(currentServer==='hindi') url=`https://vidsrc.me/embed/tv?tmdb=${currentId}&season=${currentSeason}&episode=${currentEpisode}&ds_lang=hi`;
-    else if(currentServer==='tamil') url=`https://vidsrc.me/embed/tv?tmdb=${currentId}&season=${currentSeason}&episode=${currentEpisode}&ds_lang=ta`;
-    else if(currentServer==='telugu') url=`https://vidsrc.me/embed/tv?tmdb=${currentId}&season=${currentSeason}&episode=${currentEpisode}&ds_lang=te`;
-    else if(currentServer==='french') url=`https://vidsrc.me/embed/tv?tmdb=${currentId}&season=${currentSeason}&episode=${currentEpisode}&ds_lang=fr`;
-    else if(currentServer==='4k') url=`https://vidsrc.xyz/embed/tv?tmdb=${currentId}&season=${currentSeason}&episode=${currentEpisode}&quality=4k`;
-    else if(currentServer==='vidsrc') url=`https://vidsrc.xyz/embed/tv?tmdb=${currentId}&season=${currentSeason}&episode=${currentEpisode}`;
-    else if(currentServer==='vidsrc2') url=`https://vidsrc.cc/v2/embed/tv/${imdbId}/${currentSeason}/${currentEpisode}`;
-    else url=`https://www.2embed.cc/embedtv/${currentId}&s=${currentSeason}&e=${currentEpisode}`;
-  }
-  $('videoFrame').src=url;
+function loadServerUrl(url, btn){
+  document.querySelectorAll('.server-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  $('videoFrame').src = url;
 }
 
 function closeModal(){
